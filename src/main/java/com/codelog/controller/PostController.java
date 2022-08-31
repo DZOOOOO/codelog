@@ -8,23 +8,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 public class PostController {
 
     @PostMapping("/posts")
-    public String post(@RequestBody @Valid PostCreate params, BindingResult result) {
-        if (result.hasErrors()) {
-            List<FieldError> fieldErrors = (List<FieldError>) result.getFieldError();
-            FieldError firstFieldError = fieldErrors.get(0);
-            String fieldName = firstFieldError.getField();
-            String errorMessage = firstFieldError.getDefaultMessage();
-
-
-        }
-        log.info("params = {}", params.toString());
-        return "Hello World";
+    public Map<String, String> post(@RequestBody @Valid PostCreate params) {
+        return Map.of();
     }
 
 
