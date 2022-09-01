@@ -4,6 +4,7 @@ import com.codelog.domain.Post;
 import com.codelog.repository.PostRepository;
 import com.codelog.request.PostCreate;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -106,5 +107,52 @@ public class PostControllerTest {
         Post post = postRepository.findAll().get(0);
         Assertions.assertEquals("제목입니다.", post.getTitle());
         Assertions.assertEquals("내용입니다.", post.getContent());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회")
+    void test4() throws Exception {
+        // given
+        Post content = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+
+        postRepository.save(content);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/posts/{postsId}", content.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(content.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("foo"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("bar"))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    @DisplayName("글 여러개 조회")
+    void test5() throws Exception {
+        // given
+        Post post1 = postRepository.save(Post.builder()
+                .title("title_1")
+                .content("content_1")
+                .build());
+
+        Post post2 = postRepository.save(Post.builder()
+                .title("title_2")
+                .content("content_2")
+                .build());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/posts")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()", Matchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(post1.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("title_1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].content").value("content_1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(post2.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("title_2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].content").value("content_2"))
+                .andDo(MockMvcResultHandlers.print());
     }
 }

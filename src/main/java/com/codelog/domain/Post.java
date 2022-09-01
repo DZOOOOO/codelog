@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+// 서비스의 정책을 엔티티에는 절대로 넣지 말자..!!!!!!!!!
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
@@ -24,4 +25,5 @@ public class Post {
         this.title = title;
         this.content = content;
     }
+
 }
