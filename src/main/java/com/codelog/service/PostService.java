@@ -3,6 +3,7 @@ package com.codelog.service;
 import com.codelog.domain.Post;
 import com.codelog.repository.PostRepository;
 import com.codelog.request.PostCreate;
+import com.codelog.request.PostSearch;
 import com.codelog.response.PostResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,8 +45,8 @@ public class PostService {
         return response;
     }
 
-    public List<PostResponse> getList() {
-        return postRepository.findAll().stream()
+    public List<PostResponse> getList(PostSearch postSearch) {
+        return postRepository.getList(postSearch).stream()
                 .map(post -> new PostResponse(post))
                 .collect(Collectors.toList());
     }

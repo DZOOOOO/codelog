@@ -3,6 +3,7 @@ package com.codelog.service;
 import com.codelog.domain.Post;
 import com.codelog.repository.PostRepository;
 import com.codelog.request.PostCreate;
+import com.codelog.request.PostSearch;
 import com.codelog.response.PostResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @SpringBootTest
 class PostServiceTest {
@@ -70,25 +73,31 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("글 여러개 조회")
+    @DisplayName("글 1페이지 조회")
     void test3() {
         // given
-        postRepository.saveAll(List.of(
-                Post.builder()
-                        .title("foo1")
-                        .content("bar1")
-                        .build(),
-                Post.builder()
-                        .title("foo2")
-                        .content("bar2")
-                        .build()
-        ));
+        List<Post> requestPosts = IntStream.range(0, 20)
+                .mapToObj(i -> Post.builder()
+                        .title("foo" + i)
+                        .content("bar1" + i)
+                        .build())
+                .collect(Collectors.toList());
+
+        postRepository.saveAll(requestPosts);
+
+        PostSearch postSearch = PostSearch.builder()
+                .page(1)
+                .size(10)
+                .build();
+
 
         // when
-        List<PostResponse> posts = postService.getList();
+        List<PostResponse> posts = postService.getList(postSearch);
 
         // then
-        Assertions.assertEquals(2L, posts.size());
+        Assertions.assertEquals(10L, posts.size());
+        Assertions.assertEquals("foo19", posts.get(0).getTitle());
     }
+
 
 }

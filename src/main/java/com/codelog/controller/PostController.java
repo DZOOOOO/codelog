@@ -1,6 +1,7 @@
 package com.codelog.controller;
 
 import com.codelog.request.PostCreate;
+import com.codelog.request.PostSearch;
 import com.codelog.response.PostResponse;
 import com.codelog.service.PostService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +36,10 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<PostResponse> getList() {
-        return postService.getList();
+    public List<PostResponse> getList(@ModelAttribute PostSearch postSearch) {
+        return postService.getList(postSearch);
     }
+
+
 
 }

@@ -18,6 +18,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 @AutoConfigureMockMvc
 @SpringBootTest
 public class PostControllerTest {
@@ -130,29 +134,23 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 여러개 조회")
+    @DisplayName("page = 0 요청시 첫번째 페이지가 나타나야 한다.")
     void test5() throws Exception {
         // given
-        Post post1 = postRepository.save(Post.builder()
-                .title("title_1")
-                .content("content_1")
-                .build());
+        List<Post> requestPosts = IntStream.range(0, 20)
+                .mapToObj(i -> Post.builder()
+                        .title("foo" + i)
+                        .content("bar" + i)
+                        .build())
+                .collect(Collectors.toList());
+        postRepository.saveAll(requestPosts);
 
-        Post post2 = postRepository.save(Post.builder()
-                .title("title_2")
-                .content("content_2")
-                .build());
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/posts")
+        mockMvc.perform(MockMvcRequestBuilders.get("/posts?page=0&size=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()", Matchers.is(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(post1.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("title_1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].content").value("content_1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(post2.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("title_2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].content").value("content_2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()", Matchers.is(10)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].title").value("foo19"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].content").value("bar19"))
                 .andDo(MockMvcResultHandlers.print());
     }
 }
