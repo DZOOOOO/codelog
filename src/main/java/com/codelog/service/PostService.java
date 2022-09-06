@@ -2,6 +2,7 @@ package com.codelog.service;
 
 import com.codelog.domain.Post;
 import com.codelog.domain.PostEditor;
+import com.codelog.exception.PostNotFound;
 import com.codelog.repository.PostRepository;
 import com.codelog.request.PostCreate;
 import com.codelog.request.PostEdit;
@@ -37,7 +38,7 @@ public class PostService {
     public PostResponse get(Long id) {
         // Optional 보다는 바로 꺼내올 수 있는 코드를 추천
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(() -> new PostNotFound());
 
         PostResponse response = PostResponse.builder()
                 .id(post.getId())
@@ -57,7 +58,7 @@ public class PostService {
     @Transactional
     public PostResponse edit(Long id, PostEdit postEdit) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(() -> new PostNotFound());
 
         PostEditor.PostEditorBuilder editorBuilder = post.toEditor();
 
@@ -73,7 +74,7 @@ public class PostService {
 
     public void delete(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글 입니다."));
+                .orElseThrow(() -> new PostNotFound());
 
         postRepository.delete(post);
     }
