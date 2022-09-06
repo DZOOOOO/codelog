@@ -1,6 +1,7 @@
 package com.codelog.controller;
 
 import com.codelog.request.PostCreate;
+import com.codelog.request.PostEdit;
 import com.codelog.request.PostSearch;
 import com.codelog.response.PostResponse;
 import com.codelog.service.PostService;
@@ -40,6 +41,15 @@ public class PostController {
         return postService.getList(postSearch);
     }
 
+    @PatchMapping("posts/{postId}")
+    public PostResponse patch(@PathVariable("postId") Long postId, @RequestBody @Valid PostEdit request) {
+        return postService.edit(postId, request);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public void delete(@PathVariable("postId") Long postId) {
+        postService.delete(postId);
+    }
 
 
 }
